@@ -1,0 +1,44 @@
+Step 1: Create a Table
+We'll create an EMPLOYEES table to store employee information.
+
+
+command 1 ==>	CREATE TABLE EMPLOYEES (
+    		EMP_ID NUMBER PRIMARY KEY,
+    		EMP_NAME VARCHAR2(100),
+    		SALARY NUMBER
+		);
+
+Step 2: Create a Sequence
+Next, we will create a sequence to automatically generate unique employee IDs.
+
+
+command 2 ==>	CREATE SEQUENCE EMPLOYEE_SEQ
+		START WITH 1
+		INCREMENT BY 1;
+
+
+
+Step 3: Insert Data Using the Sequence
+Now, we can insert employee records into the EMPLOYEES table using the sequence for the EMP_ID.
+
+
+command 3 ==>	INSERT INTO EMPLOYEES (EMP_ID, EMP_NAME, SALARY) VALUES (EMPLOYEE_SEQ.NEXTVAL, 'Alice', 5000);
+		INSERT INTO EMPLOYEES (EMP_ID, EMP_NAME, SALARY) VALUES (EMPLOYEE_SEQ.NEXTVAL, 'Bob', 6000);
+		INSERT INTO EMPLOYEES (EMP_ID, EMP_NAME, SALARY) VALUES (EMPLOYEE_SEQ.NEXTVAL, 'Charlie', 5500);
+		INSERT INTO EMPLOYEES (EMP_ID, EMP_NAME, SALARY) VALUES (EMPLOYEE_SEQ.NEXTVAL, 'David', 7000);
+		INSERT INTO EMPLOYEES (EMP_ID, EMP_NAME, SALARY) VALUES (EMPLOYEE_SEQ.NEXTVAL, 'Eva', 6500);
+
+Step 4: Create a View
+Next, we’ll create a view to display employee names and their salaries. A view allows you to simplify complex queries or provide a more user-friendly way to interact with the data.
+
+
+command 4 ==>	CREATE OR REPLACE VIEW EMPLOYEE_VIEW AS
+		SELECT EMP_NAME, SALARY
+		FROM EMPLOYEES;
+
+
+Step 5: Query the View
+You can now query the view to see the employees and their salaries:
+
+
+command 5 ==>	SELECT * FROM EMPLOYEE_VIEW;

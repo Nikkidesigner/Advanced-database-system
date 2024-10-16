@@ -1,0 +1,69 @@
+Step 1: Create the Employees Table
+First, create the EMPLOYEES table where you can store employee information.
+
+
+command 1 ==>	CREATE TABLE EMPLOYEES (
+    		EMP_ID NUMBER PRIMARY KEY,
+    		EMP_NAME VARCHAR2(100),
+    		SALARY NUMBER
+		);
+
+
+Step 2: Insert Sample Data into the Employees Table
+Next, you should insert some sample data into the EMPLOYEES table to work with. Here are a few example insert statements:
+
+
+
+command 2 ==>	INSERT INTO EMPLOYEES (EMP_ID, EMP_NAME, SALARY) VALUES (1, 'John Doe', 5000);
+		INSERT INTO EMPLOYEES (EMP_ID, EMP_NAME, SALARY) VALUES (2, 'Alice Smith', 6000);
+		INSERT INTO EMPLOYEES (EMP_ID, EMP_NAME, SALARY) VALUES (3, 'Bob Johnson', 5500);
+		INSERT INTO EMPLOYEES (EMP_ID, EMP_NAME, SALARY) VALUES (4, 'Charlie Brown', 7000);
+		INSERT INTO EMPLOYEES (EMP_ID, EMP_NAME, SALARY) VALUES (5, 'Diana Prince', 6500);
+
+
+Step 3: Commit the Changes
+After inserting the data, you may need to commit the changes (depending on your SQL environment) to ensure they are saved to the database:
+
+
+command 3 ==>	COMMIT;
+
+
+Step 4: Now Execute the Cursor Examples
+After setting up the EMPLOYEES table and inserting sample data, you can now run the cursor examples I provided earlier.
+
+Example of Implicit Cursor:
+
+
+command 4 ==>	DECLARE
+    		emp_name VARCHAR2(100);
+    		emp_salary NUMBER;
+		BEGIN
+    		SELECT EMP_NAME, SALARY INTO emp_name, emp_salary
+    		FROM EMPLOYEES
+    		WHERE EMP_ID = 1; -- Fetching the employee with ID 1
+    		DBMS_OUTPUT.PUT_LINE('Employee Name: ' || emp_name);
+    		DBMS_OUTPUT.PUT_LINE('Employee Salary: ' || emp_salary);
+		END;
+		/
+
+
+
+Example of Explicit Cursor:
+
+
+
+command 5 ==>	DECLARE
+    		CURSOR emp_cursor IS
+        	SELECT EMP_NAME, SALARY FROM EMPLOYEES; -- Cursor to fetch employee names and salaries
+    		emp_record emp_cursor%ROWTYPE; -- Variable to hold each row fetched
+		BEGIN
+    		OPEN emp_cursor; -- Open the cursor
+    		LOOP
+        	FETCH emp_cursor INTO emp_record; -- Fetch a row into emp_record
+       	 	EXIT WHEN emp_cursor%NOTFOUND; -- Exit the loop if no more rows to fetch
+        	DBMS_OUTPUT.PUT_LINE('Employee Name: ' || emp_record.EMP_NAME);
+        	DBMS_OUTPUT.PUT_LINE('Employee Salary: ' || emp_record.SALARY);
+    		END LOOP;
+	    	CLOSE emp_cursor; -- Close the cursor
+		END;
+		/

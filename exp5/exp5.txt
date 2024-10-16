@@ -1,0 +1,117 @@
+1. Create a Sample Database
+Start by creating a database for your operations.
+
+ Command 1 ==> CREATE DATABASE ParallelDB;
+
+
+ command 2 ==> USE ParallelDB;
+ 
+2. Create Sample Tables
+Create two sample tables for performing joins, sorting, and aggregation.
+
+
+command 3 ==> CREATE TABLE Employees
+		(
+   		 EmployeeID INT PRIMARY KEY,
+    		 Name VARCHAR2(100),
+    		 DepartmentID INT
+		);
+
+              -- Create Departments table
+command 4 ==> CREATE TABLE Departments
+		(
+    		DepartmentID INT PRIMARY KEY,
+    		DepartmentName VARCHAR2(100)
+		);
+
+-- Create Sales table for aggregation
+
+
+command 5 ==> CREATE TABLE Sales
+		(
+    		SaleID INT PRIMARY KEY,
+		EmployeeID INT,
+    		SaleAmount DECIMAL(10, 2),
+    		SaleDate DATE
+		);
+
+
+3. Insert Dummy Data
+Insert sample data into the Employees, Departments, and Sales tables.
+
+
+-- Insert data into Departments
+command 6 ==>  	INSERT INTO Departments (DepartmentID, DepartmentName) VALUES (1, 'Sales');
+		INSERT INTO Departments (DepartmentID, DepartmentName) VALUES (2, 'HR');
+		INSERT INTO Departments (DepartmentID, DepartmentName) VALUES (3, 'IT');
+		INSERT INTO Departments (DepartmentID, DepartmentName) VALUES (4, 'Finance');
+
+
+
+-- Insert data into Employees
+command 7 ==>   INSERT INTO Employees (EmployeeID, Name, DepartmentID) VALUES (1, 'Alice', 1);
+		INSERT INTO Employees (EmployeeID, Name, DepartmentID) VALUES (2, 'Bob', 1);
+		INSERT INTO Employees (EmployeeID, Name, DepartmentID) VALUES (3, 'Charlie', 2);
+		INSERT INTO Employees (EmployeeID, Name, DepartmentID) VALUES (4, 'David', 3);
+		INSERT INTO Employees (EmployeeID, Name, DepartmentID) VALUES (5, 'Eva', 4);
+
+
+
+
+-- Insert data into Sales
+command 8 ==> INSERT INTO Sales (SaleID, EmployeeID, SaleAmount, SaleDate) 
+		VALUES (1, 1, 1500.00, TO_DATE('2024-01-01', 'YYYY-MM-DD'));
+		INSERT INTO Sales (SaleID, EmployeeID, SaleAmount, SaleDate) 
+		VALUES (2, 1, 3000.00, TO_DATE('2024-01-02', 'YYYY-MM-DD'));
+		INSERT INTO Sales (SaleID, EmployeeID, SaleAmount, SaleDate) 
+		VALUES (3, 2, 2000.00, TO_DATE('2024-01-01', 'YYYY-MM-DD'));
+		INSERT INTO Sales (SaleID, EmployeeID, SaleAmount, SaleDate) 
+		VALUES (4, 3, 2500.00, TO_DATE('2024-01-02', 'YYYY-MM-DD'));
+		INSERT INTO Sales (SaleID, EmployeeID, SaleAmount, SaleDate) 
+		VALUES (5, 4, 3500.00, TO_DATE('2024-01-01', 'YYYY-MM-DD'));
+		INSERT INTO Sales (SaleID, EmployeeID, SaleAmount, SaleDate) 
+		VALUES (6, 5, 4000.00, TO_DATE('2024-01-03', 'YYYY-MM-DD'));
+
+ 4. Parallel Joins
+You can execute parallel joins by using the SQL Server query optimizer, which automatically decides whether to use parallel execution based on the query complexity and the data size. However, you can also enforce parallelism explicitly using the OPTION (MAXDOP) hint.
+
+
+-- Example of a parallel join
+
+command 9 ==> 	SELECT e.Name, d.DepartmentName, SUM(s.SaleAmount) AS TotalSales
+		FROM Employees e
+		JOIN Departments d ON e.DepartmentID = d.DepartmentID
+		LEFT JOIN Sales s ON e.EmployeeID = s.EmployeeID
+		GROUP BY e.Name, d.DepartmentName;
+		 
+
+
+
+5. Sorting
+Sorting can also benefit from parallelism in SQL Server. You can use the ORDER BY clause in your queries.
+
+
+-- Example of sorting the result set
+
+command 10 ==>  SELECT e.Name, SUM(s.SaleAmount) AS TotalSales
+		FROM Employees e
+		LEFT JOIN Sales s ON e.EmployeeID = s.EmployeeID
+		GROUP BY e.Name
+		ORDER BY TotalSales DESC;
+		
+
+
+6. Aggregates
+SQL Server automatically uses parallel execution for aggregate operations when the optimizer deems it necessary. You can explicitly define aggregate functions in your queries.
+
+
+
+-- Example of aggregate calculations with parallel execution
+
+command 11 ==>  SELECT d.DepartmentName, COUNT(e.EmployeeID) AS EmployeeCount, SUM(s.SaleAmount) AS TotalSales
+		FROM Departments d
+		LEFT JOIN Employees e ON d.DepartmentID = e.DepartmentID
+		LEFT JOIN Sales s ON e.EmployeeID = s.EmployeeID
+		GROUP BY d.DepartmentName
+		ORDER BY TotalSales DESC;
+		 

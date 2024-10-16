@@ -1,0 +1,194 @@
+Predefined Table: EMPLOYEES
+You can create the EMPLOYEES table with the following SQL:
+
+
+command 1 ==>	CREATE TABLE EMPLOYEES 
+		(
+    		EMP_ID NUMBER PRIMARY KEY,
+    		EMP_NAME VARCHAR2(100),
+    		SALARY NUMBER
+		);
+
+
+Insert Some Sample Data
+You should insert some sample data into the EMPLOYEES table for the procedures to operate on:
+
+
+commamd 2 ==>	INSERT INTO EMPLOYEES (EMP_ID, EMP_NAME, SALARY) VALUES (1, 'John', 5000);
+		INSERT INTO EMPLOYEES (EMP_ID, EMP_NAME, SALARY) VALUES (2, 'Alice', 6000);
+		INSERT INTO EMPLOYEES (EMP_ID, EMP_NAME, SALARY) VALUES (3, 'Bob', 7000);
+
+
+
+
+Example 1: Simple Procedure Without Parameters
+Let’s create a simple procedure that displays the total number of records in the CUSTOMERS table.
+
+Step 1: Create Procedure
+
+
+command 3 ==>	CREATE OR REPLACE PROCEDURE total_customers_proc 
+		IS 
+   		total NUMBER(2); 
+		BEGIN 
+   		SELECT count(*) INTO total FROM CUSTOMERS; 
+   		dbms_output.put_line('Total number of customers: ' || total); 
+		END;
+		/
+
+This procedure, total_customers_proc, will count and display the total number of customers.
+
+Step 2: Execute the Procedure
+To execute this procedure, you can use an anonymous PL/SQL block like this:
+
+
+command 4 ==>	BEGIN
+   		total_customers_proc;
+		END;
+		/
+
+This will output the total number of customers.
+
+Example 2: Procedure with IN Parameter
+Now, let's create a procedure that takes an IN parameter, like the CustomerID, and returns the details of that customer.
+
+Step 1: Create Procedure
+
+command 5 ==>	CREATE OR REPLACE PROCEDURE get_customer_details (cust_id IN NUMBER) 
+		IS 
+   		cust_name VARCHAR2(100); 
+   		cust_salary NUMBER; 
+		BEGIN 
+   		SELECT NAME, SALARY INTO cust_name, cust_salary 
+   		FROM CUSTOMERS 
+   		WHERE ID = cust_id;
+   		dbms_output.put_line('Customer Name: ' || cust_name);
+   		dbms_output.put_line('Customer Salary: ' || cust_salary);
+		END;
+		/
+
+This procedure, get_customer_details, accepts a customer ID and prints the customer’s name and salary.
+
+Step 2: Execute the Procedure
+To execute the procedure, you call it with a valid customer ID, like this:
+
+
+
+command 6 ==>	BEGIN
+   		get_customer_details(1); -- Passing customer ID 1
+		END;
+		/SET SERVEROUTPUT ON;
+
+
+This will output the name and salary of the customer with ID = 1.
+
+Example 3: Procedure with IN and OUT Parameters
+Now, let's create a procedure that takes a CustomerID as an IN parameter and returns the Salary as an OUT parameter.
+
+Step 1: Create Procedure
+
+
+command 7 ==>	CREATE OR REPLACE PROCEDURE get_customer_salary (cust_id IN NUMBER, cust_salary OUT NUMBER) 
+		IS 
+		BEGIN 
+   		SELECT SALARY INTO cust_salary 
+   		FROM CUSTOMERS 
+   		WHERE ID = cust_id;
+		END;
+		/
+
+Here, the procedure get_customer_salary accepts the customer ID as an input and returns the salary using an output parameter.
+
+Step 2: Execute the Procedure
+To execute this procedure, you need to declare a variable to hold the output value:
+
+
+command 8 ==>	DECLARE
+   		salary NUMBER;
+		BEGIN
+   		get_customer_salary(1, salary); -- Passing customer ID 1
+   		dbms_output.put_line('Customer Salary: ' || salary);
+		END;
+		/
+
+This will output the salary of the customer with ID = 1.
+
+Example 4: Procedure with IN OUT Parameter
+Let’s create a procedure where we modify the salary of a customer using an IN OUT parameter.
+
+Step 1: Create Procedure
+
+command 9 ==>	CREATE OR REPLACE PROCEDURE update_salary (cust_id IN NUMBER, cust_salary IN OUT NUMBER) 
+		IS 
+		BEGIN 
+   		UPDATE CUSTOMERS 
+   		SET SALARY = cust_salary 
+   		WHERE ID = cust_id;
+   		dbms_output.put_line('Updated salary for customer ID ' || cust_id || ' is ' || cust_salary);
+		END;
+		/
+
+
+Here, update_salary allows you to update a customer’s salary using the cust_id and cust_salary parameters.
+
+Step 2: Execute the Procedure
+You need to pass the customer ID and new salary to this procedure:
+
+
+commamd 10 ==>	DECLARE
+   		new_salary NUMBER := 5000;
+		BEGIN
+   		update_salary(1, new_salary); -- Updating salary for customer ID 1
+		END;
+		/
+
+This will update the salary of the customer with ID = 1 to 5000 and output the updated value.
+
+Example 5: Procedure to Delete a Customer
+You can also create a procedure to delete a customer record from the table.
+
+Step 1: Create Procedure
+
+command 11 ==>	CREATE OR REPLACE PROCEDURE delete_customer (cust_id IN NUMBER) 
+		IS 
+		BEGIN 
+   		DELETE FROM CUSTOMERS 
+   		WHERE ID = cust_id;
+   		dbms_output.put_line('Customer with ID ' || cust_id || ' deleted.');
+		END;
+		/
+
+This delete_customer procedure takes a customer ID as an input and deletes the record for that ID.
+
+Step 2: Execute the Procedure
+
+command 12 ==>		BEGIN
+   			delete_customer(3); -- Deleting customer with ID 3
+			END;
+			/
+
+This will delete the customer with ID = 3 from the CUSTOMERS table.
+
+Summary of Procedure Examples
+Simple Procedure Without Parameters:
+
+Display total customers.
+Procedure with IN Parameter:
+
+Fetch customer details based on ID.
+Procedure with IN and OUT Parameters:
+
+Return customer salary based on ID.
+Procedure with IN OUT Parameters:
+
+Update customer salary.
+Procedure to Delete a Customer:
+
+Delete a customer record from the table.
+By using these examples, you can get a clear idea of how to implement various types of PL/SQL procedures in Oracle. Each of these examples demonstrates a different use case for procedures, which can be customized further as needed.
+
+
+
+
+
+

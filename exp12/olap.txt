@@ -1,0 +1,163 @@
+Step 1: Create Sample Tables and Data
+Create Dimensions and Facts Table
+Create DIM_TIME Table:
+
+command 1 ==>	CREATE TABLE DIM_TIME (
+    		TIME_ID NUMBER PRIMARY KEY,
+    		YEAR NUMBER,
+    		MONTH VARCHAR2(20)
+		);
+
+
+Create DIM_PRODUCT Table:
+
+
+command 2 ==>	CREATE TABLE DIM_PRODUCT (
+    		PRODUCT_ID NUMBER PRIMARY KEY,
+    		PRODUCT_NAME VARCHAR2(100)
+		);
+
+
+Create DIM_REGION Table:
+
+
+command 3 ==>	CREATE TABLE DIM_REGION (
+		REGION_ID NUMBER PRIMARY KEY,
+    		REGION_NAME VARCHAR2(100)
+		);
+
+Create FACT_SALES Table:
+
+
+
+command 4 ==>	CREATE TABLE FACT_SALES (
+    		TIME_ID NUMBER,
+    		PRODUCT_ID NUMBER,
+    		REGION_ID NUMBER,
+    		SALES_AMOUNT NUMBER,
+    		FOREIGN KEY (TIME_ID) REFERENCES DIM_TIME(TIME_ID),
+    		FOREIGN KEY (PRODUCT_ID) REFERENCES DIM_PRODUCT(PRODUCT_ID),
+    		FOREIGN KEY (REGION_ID) REFERENCES DIM_REGION(REGION_ID)
+		);
+
+
+Insert Sample Data
+
+
+-- Insert data into DIM_TIME
+command 5 ==> 
+		INSERT INTO DIM_TIME VALUES (1, 2024, 'January');
+		INSERT INTO DIM_TIME VALUES (2, 2024, 'February');
+		INSERT INTO DIM_PRODUCT VALUES (1, 'Product A');
+		INSERT INTO DIM_PRODUCT VALUES (2, 'Product B');
+		INSERT INTO DIM_REGION VALUES (1, 'North');
+		INSERT INTO DIM_REGION VALUES (2, 'South');
+		INSERT INTO FACT_SALES VALUES (1, 1, 1, 1000); 
+		INSERT INTO FACT_SALES VALUES (1, 1, 2, 1500); 
+		INSERT INTO FACT_SALES VALUES (2, 2, 1, 2000); 
+		INSERT INTO FACT_SALES VALUES (2, 2, 2, 2500); 
+
+
+Step 2: OLAP Operations
+
+1. ROLLUP Operation
+The ROLLUP operation aggregates data across different levels. For example, to summarize sales by month and product:
+
+
+command 6 ==>	SELECT 
+    		TIME.YEAR, 
+    		DIM_PRODUCT.PRODUCT_NAME, 
+    		SUM(FACT_SALES.SALES_AMOUNT) AS TOTAL_SALES
+		FROM 
+		FACT_SALES
+		JOIN 
+   		DIM_TIME ON FACT_SALES.TIME_ID = DIM_TIME.TIME_ID
+		JOIN 
+    		DIM_PRODUCT ON FACT_SALES.PRODUCT_ID = DIM_PRODUCT.PRODUCT_ID
+		GROUP BY ROLLUP (TIME.YEAR, DIM_PRODUCT.PRODUCT_NAME);
+
+
+
+
+2. DRILLDOWN Operation
+To drill down to a more detailed view of sales, you can start from a higher level and specify more granular details:
+
+
+command 7 ==>	SELECT 
+    		DIM_TIME.MONTH, 
+    		DIM_PRODUCT.PRODUCT_NAME, 
+    		SUM(FACT_SALES.SALES_AMOUNT) AS TOTAL_SALES
+		FROM 
+		FACT_SALES
+		JOIN 
+		DIM_TIME ON FACT_SALES.TIME_ID = DIM_TIME.TIME_ID
+		JOIN 
+		DIM_PRODUCT ON FACT_SALES.PRODUCT_ID = DIM_PRODUCT.PRODUCT_ID
+		GROUP BY 
+    		DIM_TIME.MONTH, DIM_PRODUCT.PRODUCT_NAME;
+
+
+3. CUBE Operation
+
+The CUBE operation computes aggregations across all combinations of specified dimensions.
+
+command 8 ==>	SELECT 
+    		DIM_TIME.YEAR, 
+    		DIM_PRODUCT.PRODUCT_NAME, 
+    		DIM_REGION.REGION_NAME, 
+    		SUM(FACT_SALES.SALES_AMOUNT) AS TOTAL_SALES
+		FROM 
+    		FACT_SALES
+		JOIN 
+    		DIM_TIME ON FACT_SALES.TIME_ID = DIM_TIME.TIME_ID
+		JOIN 
+    		DIM_PRODUCT ON FACT_SALES.PRODUCT_ID = DIM_PRODUCT.PRODUCT_ID
+		JOIN 
+    		DIM_REGION ON FACT_SALES.REGION_ID = DIM_REGION.REGION_ID
+		GROUP BY CUBE (DIM_TIME.YEAR, DIM_PRODUCT.PRODUCT_NAME, DIM_REGION.REGION_NAME);
+
+
+
+
+4. SLICE Operation
+The SLICE operation can be represented by filtering a specific dimension. For example, to view sales for a specific month:
+
+
+command 9 ==>	SELECT 
+    		DIM_PRODUCT.PRODUCT_NAME, 
+    		SUM(FACT_SALES.SALES_AMOUNT) AS TOTAL_SALES
+		FROM 
+    		FACT_SALES
+		JOIN 
+  		DIM_TIME ON FACT_SALES.TIME_ID = DIM_TIME.TIME_ID
+		JOIN 
+    		DIM_PRODUCT ON FACT_SALES.PRODUCT_ID = DIM_PRODUCT.PRODUCT_ID
+		WHERE 
+    		DIM_TIME.YEAR = 2024 AND DIM_TIME.MONTH = 'January'
+		GROUP BY 
+    		DIM_PRODUCT.PRODUCT_NAME;
+
+
+
+
+
+5. DICE Operation
+The DICE operation can be represented by filtering on multiple dimensions. For example, to see sales for specific products in a specific region:
+
+command 10 ==> 	SELECT 
+    		DIM_TIME.YEAR, 
+   		DIM_PRODUCT.PRODUCT_NAME, 
+    		SUM(FACT_SALES.SALES_AMOUNT) AS TOTAL_SALES
+		FROM 
+    		FACT_SALES
+		JOIN 
+    		DIM_TIME ON FACT_SALES.TIME_ID = DIM_TIME.TIME_ID
+		JOIN 
+    		DIM_PRODUCT ON FACT_SALES.PRODUCT_ID = DIM_PRODUCT.PRODUCT_ID
+		JOIN 
+    		DIM_REGION ON FACT_SALES.REGION_ID = DIM_REGION.REGION_ID
+		WHERE 
+    		DIM_PRODUCT.PRODUCT_NAME IN ('Product A', 'Product B') AND 
+    		DIM_REGION.REGION_NAME = 'North'
+		GROUP BY 
+    		DIM_TIME.YEAR, DIM_PRODUCT.PRODUCT_NAME;
