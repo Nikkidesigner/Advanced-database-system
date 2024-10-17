@@ -22,3 +22,13 @@ command 3 ==>
     	SALES 
 	WHERE 
     	SALE_DATE BETWEEN TO_DATE('2022-01-01', 'YYYY-MM-DD') AND TO_DATE('2022-12-31', 'YYYY-MM-DD');
+
+
+--Partitioning is not available: You're likely using Oracle Express Edition (XE) or an older version of Oracle that does not support partitioning. Partitioning is available in Oracle Standard and Enterprise Editions, but not in Oracle XE.
+PARTITION BY RANGE (SALE_DATE)
+ (
+    PARTITION p1 VALUES LESS THAN (TO_DATE('2022-01-01', 'YYYY-MM-DD')),
+    PARTITION p2 VALUES LESS THAN (TO_DATE('2023-01-01', 'YYYY-MM-DD')),
+    PARTITION p3 VALUES LESS THAN (MAXVALUE)
+);
+
